@@ -36,13 +36,243 @@ $stats_query = "SELECT
                 $where";
 $stats = $conn->query($stats_query)->fetch_assoc();
 
-
 // Nama bulan
 $nama_bulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 ?>
 
+<style>
+@media print {
+    /* Reset untuk print */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+    
+    html,
+    body,
+    .container,
+    .min-h-screen,
+    .bg-gray-100,
+    .bg-gray-50 {
+        background: white !important;
+    }
+    
+    .no-print { 
+        display: none !important; 
+    }
+    
+    body { 
+        background: white;
+        margin: 0;
+        padding: 20px;
+    }
+    
+    .container { 
+        background: white;
+        max-width: 100%;
+        margin: 0;
+        padding: 0;
+    }
+    
+    /* Kop Surat */
+    .print-header {
+        display: block !important;
+        text-align: center;
+        border-bottom: 3px solid #000;
+        padding-bottom: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .print-header h1 {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0 0 5px 0;
+        color: #000;
+    }
+    
+    .print-header p {
+        margin: 3px 0;
+        font-size: 12px;
+        color: #000;
+    }
+    
+    /* Judul Laporan */
+    .print-title {
+        text-align: center;
+        margin: 20px 0;
+    }
+    
+    .print-title h2 {
+        font-size: 18px;
+        font-weight: bold;
+        text-decoration: underline;
+        margin: 0;
+        color: #000;
+    }
+    
+    .print-title p {
+        font-size: 14px;
+        margin: 5px 0;
+        color: #000;
+    }
+    
+    /* Statistik untuk print */
+    .stats-print {
+        display: block !important;
+        margin: 20px 0;
+        page-break-inside: avoid;
+    }
+    
+    .stats-print table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+    
+    .stats-print td {
+        padding: 8px;
+        border: 1px solid #000;
+        font-size: 12px;
+    }
+    
+    .stats-print td:first-child {
+        font-weight: bold;
+        width: 40%;
+        background: #f0f0f0;
+    }
+    
+    /* Tabel detail */
+    .detail-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 11px;
+    }
+    
+    .detail-table th {
+        background: #f0f0f0;
+        border: 1px solid #000;
+        padding: 8px 5px;
+        font-weight: bold;
+        text-align: left;
+        color: #000;
+    }
+    
+    .detail-table td {
+        border: 1px solid #000;
+        padding: 6px 5px;
+        color: #000;
+    }
+    
+    .detail-table .text-right {
+        text-align: right;
+    }
+    
+    .detail-table .text-center {
+        text-align: center;
+    }
+    
+    .detail-table .total-row {
+        background: #f0f0f0;
+        font-weight: bold;
+    }
+    
+    /* Footer untuk print */
+    .print-footer {
+        display: block !important;
+        margin-top: 40px;
+        page-break-inside: avoid;
+    }
+    
+    .signature-section {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+    
+    .signature-box {
+        text-align: center;
+        width: 45%;
+    }
+    
+    .signature-box p {
+        margin: 5px 0;
+        font-size: 12px;
+    }
+    
+    .signature-line {
+        margin-top: 60px;
+        border-top: 1px solid #000;
+        padding-top: 5px;
+    }
+    
+    /* Hide screen elements */
+    .screen-only {
+        display: none !important;
+    }
+    
+    /* Gradients jadi flat untuk print */
+    .bg-gradient-to-br {
+        background: #f0f0f0 !important;
+        color: #000 !important;
+    }
+}
+
+/* Screen styles */
+.print-header,
+.print-title,
+.stats-print,
+.print-footer {
+    display: none;
+}
+</style>
+
 <div class="container mx-auto px-4 py-8">
-    <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+    <!-- KOP SURAT (hanya muncul saat print) -->
+    <div class="print-header">
+        <h1>KLINIK SEHAT SENTOSA</h1>
+        <p>Jl. Kesehatan No. 123, Jakarta Pusat 10110</p>
+        <p>Telp: (021) 1234-5678 | Email: info@kliniksehat.com</p>
+    </div>
+    
+    <!-- JUDUL LAPORAN (hanya muncul saat print) -->
+    <div class="print-title">
+        <h2>LAPORAN REKAM MEDIS</h2>
+        <p>Periode: <?= $nama_bulan[(int)$bulan] ?> <?= $tahun ?></p>
+        <p><?= $jenis ? "Jenis Perawatan: $jenis" : "Semua Jenis Perawatan" ?></p>
+    </div>
+    
+    <!-- STATISTIK UNTUK PRINT (hanya muncul saat print) -->
+    <div class="stats-print">
+        <table>
+            <tr>
+                <td>Total Rekam Medis</td>
+                <td><?= $stats['total_rekam'] ?> Rekam Medis</td>
+            </tr>
+            <tr>
+                <td>Rawat Jalan</td>
+                <td><?= $stats['rawat_jalan'] ?? 0 ?> Pasien</td>
+            </tr>
+            <tr>
+                <td>Rawat Inap</td>
+                <td><?= $stats['rawat_inap'] ?? 0 ?> Pasien</td>
+            </tr>
+            <tr>
+                <td>Total Pendapatan</td>
+                <td><strong>Rp <?= number_format($stats['total_pendapatan'] ?? 0, 0, ',', '.') ?></strong></td>
+            </tr>
+            <tr>
+                <td>Pendapatan Lunas</td>
+                <td>Rp <?= number_format($stats['pendapatan_lunas'] ?? 0, 0, ',', '.') ?></td>
+            </tr>
+            <tr>
+                <td>Pendapatan Pending</td>
+                <td>Rp <?= number_format($stats['pendapatan_pending'] ?? 0, 0, ',', '.') ?></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-6 screen-only">
         <div class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold text-gray-800">
                 <i class="fas fa-chart-bar text-purple-600"></i> Laporan Rekam Medis
@@ -161,7 +391,7 @@ $nama_bulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-700 mb-1">Pendapatan Lunas</p>
-                        <h3 class="text-2xl font-bold text-green-600">Rp <?= number_format($stats['total_pendapatan'] ?? 0, 0, ',', '.') ?></h3>
+                        <h3 class="text-2xl font-bold text-green-600">Rp <?= number_format($stats['pendapatan_lunas'] ?? 0, 0, ',', '.') ?></h3>
                     </div>
                     <i class="fas fa-check-circle text-4xl text-green-500"></i>
                 </div>
@@ -171,85 +401,109 @@ $nama_bulan = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-gray-700 mb-1">Pendapatan Pending</p>
-                        <h3 class="text-2xl font-bold text-red-600">Rp <?= number_format($stats['total_pendapatan'] ?? 0, 0, ',', '.') ?></h3>
+                        <h3 class="text-2xl font-bold text-red-600">Rp <?= number_format($stats['pendapatan_pending'] ?? 0, 0, ',', '.') ?></h3>
                     </div>
                     <i class="fas fa-clock text-4xl text-red-500"></i>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Tabel Detail -->
-        <h2 class="text-xl font-bold text-gray-800 mb-4">Detail Rekam Medis</h2>
-        <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-                <thead class="bg-gray-100">
-                    <tr>
-                        <th class="px-3 py-3 text-left text-gray-700">No</th>
-                        <th class="px-3 py-3 text-left text-gray-700">Tanggal</th>
-                        <th class="px-3 py-3 text-left text-gray-700">Pasien</th>
-                        <th class="px-3 py-3 text-left text-gray-700">Dokter</th>
-                        <th class="px-3 py-3 text-left text-gray-700">Jenis</th>
-                        <th class="px-3 py-3 text-left text-gray-700">Diagnosa</th>
-                        <th class="px-3 py-3 text-right text-gray-700">Biaya</th>
-                        <th class="px-3 py-3 text-center text-gray-700">Status</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    <?php 
-                    $no = 1;
-                    $total = 0;
-                    while($row = $result->fetch_assoc()): 
-                    $total += $row['biaya_total'];
-                    ?>
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-3 py-3"><?= $no++ ?></td>
-                        <td class="px-3 py-3"><?= date('d/m/Y', strtotime($row['tanggal_periksa'])) ?></td>
-                        <td class="px-3 py-3 font-medium"><?= htmlspecialchars($row['nama_pasien']) ?></td>
-                        <td class="px-3 py-3 text-xs"><?= htmlspecialchars($row['nama_dokter']) ?></td>
-                        <td class="px-3 py-3">
-                            <?php if($row['jenis_perawatan'] == 'Rawat Inap'): ?>
-                            <span class="bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">Inap</span>
-                            <?php else: ?>
-                            <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Jalan</span>
-                            <?php endif; ?>
-                        </td>
-                        <td class="px-3 py-3 text-xs"><?= substr(htmlspecialchars($row['diagnosa']), 0, 30) ?>...</td>
-                        <td class="px-3 py-3 text-right font-semibold text-green-600">Rp <?= number_format($row['biaya_total'], 0, ',', '.') ?></td>
-                        <td class="px-3 py-3 text-center">
-                            <?php if($row['status_pembayaran'] == 'Lunas'): ?>
-                            <span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">✓</span>
-                            <?php else: ?>
-                            <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs">✗</span>
-                            <?php endif; ?>
-                        </td>
-                    </tr>
-                    <?php endwhile; ?>
-                    
-                    <?php if($result->num_rows > 0): ?>
-                    <tr class="bg-gray-100 font-bold">
-                        <td colspan="6" class="px-3 py-3 text-right">TOTAL:</td>
-                        <td class="px-3 py-3 text-right text-green-600">Rp <?= number_format($total, 0, ',', '.') ?></td>
-                        <td></td>
-                    </tr>
-                    <?php else: ?>
-                    <tr>
-                        <td colspan="8" class="px-4 py-8 text-center text-gray-500">
-                            <i class="fas fa-inbox text-4xl mb-2"></i>
-                            <p>Tidak ada data untuk periode ini</p>
-                        </td>
-                    </tr>
-                    <?php endif; ?>
-                </tbody>
-            </table>
+    <!-- Tabel Detail -->
+    <h2 class="text-xl font-bold text-gray-800 mb-4 screen-only">Detail Rekam Medis</h2>
+    <div class="overflow-x-auto">
+        <table class="w-full text-sm detail-table">
+            <thead class="bg-gray-100">
+                <tr>
+                    <th class="px-3 py-3 text-left text-gray-700">No</th>
+                    <th class="px-3 py-3 text-left text-gray-700">Tanggal</th>
+                    <th class="px-3 py-3 text-left text-gray-700">Pasien</th>
+                    <th class="px-3 py-3 text-left text-gray-700">Dokter</th>
+                    <th class="px-3 py-3 text-left text-gray-700">Jenis</th>
+                    <th class="px-3 py-3 text-left text-gray-700">Diagnosa</th>
+                    <th class="px-3 py-3 text-right text-gray-700">Biaya</th>
+                    <th class="px-3 py-3 text-center text-gray-700">Status</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <?php 
+                $no = 1;
+                $total = 0;
+                while($row = $result->fetch_assoc()): 
+                $total += $row['biaya_total'];
+                ?>
+                <tr class="hover:bg-gray-50">
+                    <td class="px-3 py-3"><?= $no++ ?></td>
+                    <td class="px-3 py-3"><?= date('d/m/Y', strtotime($row['tanggal_periksa'])) ?></td>
+                    <td class="px-3 py-3 font-medium"><?= htmlspecialchars($row['nama_pasien']) ?></td>
+                    <td class="px-3 py-3 text-xs"><?= htmlspecialchars($row['nama_dokter']) ?></td>
+                    <td class="px-3 py-3">
+                        <?php if($row['jenis_perawatan'] == 'Rawat Inap'): ?>
+                        <span class="screen-only bg-orange-100 text-orange-800 px-2 py-1 rounded text-xs">Inap</span>
+                        <span class="print-only" style="display:none;">Rawat Inap</span>
+                        <?php else: ?>
+                        <span class="screen-only bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">Jalan</span>
+                        <span class="print-only" style="display:none;">Rawat Jalan</span>
+                        <?php endif; ?>
+                    </td>
+                    <td class="px-3 py-3 text-xs"><?= substr(htmlspecialchars($row['diagnosa']), 0, 30) ?>...</td>
+                    <td class="px-3 py-3 text-right font-semibold text-green-600">Rp <?= number_format($row['biaya_total'], 0, ',', '.') ?></td>
+                    <td class="px-3 py-3 text-center">
+                        <?php if($row['status_pembayaran'] == 'Lunas'): ?>
+                        <span class="screen-only bg-green-100 text-green-800 px-2 py-1 rounded text-xs">✓</span>
+                        <span class="print-only" style="display:none;">Lunas</span>
+                        <?php else: ?>
+                        <span class="screen-only bg-red-100 text-red-800 px-2 py-1 rounded text-xs">✗</span>
+                        <span class="print-only" style="display:none;">Belum Lunas</span>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+                <?php endwhile; ?>
+                
+                <?php if($result->num_rows > 0): ?>
+                <tr class="bg-gray-100 font-bold total-row">
+                    <td colspan="6" class="px-3 py-3 text-right">TOTAL:</td>
+                    <td class="px-3 py-3 text-right text-green-600">Rp <?= number_format($total, 0, ',', '.') ?></td>
+                    <td></td>
+                </tr>
+                <?php else: ?>
+                <tr>
+                    <td colspan="8" class="px-4 py-8 text-center text-gray-500">
+                        <i class="fas fa-inbox text-4xl mb-2 screen-only"></i>
+                        <p>Tidak ada data untuk periode ini</p>
+                    </td>
+                </tr>
+                <?php endif; ?>
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- FOOTER UNTUK PRINT (hanya muncul saat print) -->
+    <div class="print-footer">
+        <div class="signature-section">
+            <div class="signature-box">
+                <p>Mengetahui,</p>
+                <p>Kepala Klinik</p>
+                <div class="signature-line">
+                    <p><strong>dr. Budiman, Sp.PD</strong></p>
+                </div>
+            </div>
+            <div class="signature-box">
+                <p>Jakarta, <?= date('d') ?> <?= $nama_bulan[(int)date('m')] ?> <?= date('Y') ?></p>
+                <p>Petugas Administrasi</p>
+                <div class="signature-line">
+                    <p><strong>(.........................)</strong></p>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <style>
 @media print {
-    .no-print { display: none !important; }
-    body { background: white; }
-    .container { max-width: 100%; }
+    .print-only {
+        display: inline !important;
+    }
 }
 </style>
 

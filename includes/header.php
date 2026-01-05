@@ -9,6 +9,20 @@
     <!-- Tambahkan baris ini untuk custom CSS -->
     <link rel="stylesheet" href="/hospital-app/assets/css/style.css">
 </head>
+<style>
+@media print {
+    header,
+    footer,
+    nav,
+    .navbar,
+    .topbar,
+    .sidebar,
+    .app-header {
+        display: none !important;
+    }
+}
+</style>
+
 <body class="bg-gray-100">
     <!-- Navbar -->
     <nav class="bg-blue-600 text-white shadow-lg">
